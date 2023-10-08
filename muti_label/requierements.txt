@@ -1,0 +1,4 @@
+# 环境py3.7
+sklearn
+transformers
+torch
