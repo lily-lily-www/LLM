@@ -1,4 +1,4 @@
-# 环境py3.7
+# 我的环境名py3.7
 sklearn
 transformers
 torch

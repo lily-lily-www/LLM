@@ -8,6 +8,7 @@ tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 config = BertConfig.from_pretrained('bert-base-uncased')
 bert_model = BertModel.from_pretrained('bert-base-uncased', config=config)
 
+
 # 自定义多标签分类模型
 class MultiLabelClassifier(nn.Module):
     def __init__(self, num_labels):
@@ -21,8 +22,9 @@ class MultiLabelClassifier(nn.Module):
         logits = self.classifier(pooled_output)
         return logits
 
+
 # 初始化多标签分类模型
-num_labels = 3 # 这里假设你的模型有3个标签/4
+num_labels = 3  # 这里假设你的模型有3个标签/4
 model = MultiLabelClassifier(num_labels)
 
 # 加载训练好的模型权重
@@ -69,7 +71,6 @@ for text in test_data:
     test_attention_mask.append(attention_mask)
 test_input_ids = torch.cat(test_input_ids, dim=0)
 test_attention_mask = torch.cat(test_attention_mask, dim=0)
-
 
 # 模型推断
 with torch.no_grad():
