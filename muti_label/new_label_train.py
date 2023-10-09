@@ -24,7 +24,7 @@ tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 config = BertConfig.from_pretrained('bert-base-uncased')
 bert_model = BertModel.from_pretrained('bert-base-uncased', config=config)
 
-
+#
 # 自定义多标签分类模型
 class MultiLabelClassifier(nn.Module):
     def __init__(self, num_labels):
