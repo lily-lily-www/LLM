@@ -51,8 +51,8 @@ model.load_state_dict(torch.load(model_path))
 
 # 获取原参数
 model_dict = model.state_dict()
-linear_abc_weight = deepcopy(model_dict['linear_abc.weight'])
-linear_abc_bias = deepcopy(model_dict['linear_abc.bias'])
+linear_abc_weight = deepcopy(model_dict['classifier.weight'])
+linear_abc_bias = deepcopy(model_dict['classifier.bias'])
 
 # 新增标签数据
 add_data = [
@@ -133,6 +133,7 @@ epochs = 5
 batch_size = 2
 
 for epoch in range(epochs):
+    new_model.train()
     for i in range(0, len(new_train_input_ids), batch_size):
         optimizer.zero_grad()
         batch_input_ids = new_train_input_ids[i:i + batch_size]
@@ -146,18 +147,16 @@ for epoch in range(epochs):
         optimizer.step()
 
 # 获取训练后最后一层参数
-model_dict = model.state_dict()
-linear_def_weight = deepcopy(model_dict['linear_def.weight'])
-linear_def_bias = deepcopy(model_dict['linear_def.bias'])
-new_label_weights = linear_def_weight[:, -4:]
-new_label_bias = linear_def_bias[:, -4:]
+model_dict = new_model.state_dict()
+linear_def_weight = deepcopy(model_dict['classifier.weight'])
+linear_def_bias = deepcopy(model_dict['classifier.bias'])
+new_label_weights = linear_def_weight[3:]
+new_label_bias = linear_def_bias[3:]
 # 与旧的合并
-new_weights = torch.cat([linear_abc_weight, new_label_weights], dim=1)
-new_bias = torch.cat([linear_abc_bias, new_label_bias], dim=1)
-new_param_dict = {}
-new_param_dict['linear_def.weight'] = new_weights
-new_param_dict['linear_def.bias'] = new_bias
-model.state_dict().update(new_param_dict)
+new_weights = torch.cat([linear_abc_weight, new_label_weights])
+new_bias = torch.cat([linear_abc_bias, new_label_bias])
+new_model.classifier.weight.data = new_weights
+new_model.classifier.bias.data = new_bias
 
 # 模型评估（与之前相同）
 new_test_input_ids = []
