@@ -3,6 +3,7 @@ import torch.nn as nn
 from sklearn.model_selection import train_test_split
 from transformers import BertTokenizer, BertModel, BertConfig
 from sklearn.metrics import f1_score, accuracy_score
+from copy import deepcopy
 
 # # 示例多标签分类数据
 old_data = [
@@ -24,7 +25,7 @@ tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 config = BertConfig.from_pretrained('bert-base-uncased')
 bert_model = BertModel.from_pretrained('bert-base-uncased', config=config)
 
-#
+
 # 自定义多标签分类模型
 class MultiLabelClassifier(nn.Module):
     def __init__(self, num_labels):
@@ -47,6 +48,11 @@ model = MultiLabelClassifier(num_labels)
 # 加载训练好的模型权重
 model_path = 'multi_label_model.pth'
 model.load_state_dict(torch.load(model_path))
+
+# 获取原参数
+model_dict = model.state_dict()
+linear_abc_weight = deepcopy(model_dict['linear_abc.weight'])
+linear_abc_bias = deepcopy(model_dict['linear_abc.bias'])
 
 # 新增标签数据
 add_data = [
@@ -127,7 +133,6 @@ epochs = 5
 batch_size = 2
 
 for epoch in range(epochs):
-    new_model.train()
     for i in range(0, len(new_train_input_ids), batch_size):
         optimizer.zero_grad()
         batch_input_ids = new_train_input_ids[i:i + batch_size]
@@ -139,6 +144,20 @@ for epoch in range(epochs):
         loss = criterion(logits, batch_labels)
         loss.backward()
         optimizer.step()
+
+# 获取训练后最后一层参数
+model_dict = model.state_dict()
+linear_def_weight = deepcopy(model_dict['linear_def.weight'])
+linear_def_bias = deepcopy(model_dict['linear_def.bias'])
+new_label_weights = linear_def_weight[:, -4:]
+new_label_bias = linear_def_bias[:, -4:]
+# 与旧的合并
+new_weights = torch.cat([linear_abc_weight, new_label_weights], dim=1)
+new_bias = torch.cat([linear_abc_bias, new_label_bias], dim=1)
+new_param_dict = {}
+new_param_dict['linear_def.weight'] = new_weights
+new_param_dict['linear_def.bias'] = new_bias
+model.state_dict().update(new_param_dict)
 
 # 模型评估（与之前相同）
 new_test_input_ids = []
