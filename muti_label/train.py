@@ -79,6 +79,7 @@ epochs = 5
 batch_size = 2
 
 for epoch in range(epochs):
+    model.train()
     for i in range(0, len(train_input_ids), batch_size):
         optimizer.zero_grad()
         batch_input_ids = train_input_ids[i:i + batch_size]
