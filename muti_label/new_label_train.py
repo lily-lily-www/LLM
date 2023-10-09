@@ -145,7 +145,8 @@ for epoch in range(epochs):
         loss = criterion(logits, batch_labels)
         loss.backward()
         optimizer.step()
-
+model_path = 'incremental_multi_label_model_ori.pth'
+torch.save(new_model.state_dict(), model_path)
 # 获取训练后最后一层参数
 model_dict = new_model.state_dict()
 linear_def_weight = deepcopy(model_dict['classifier.weight'])

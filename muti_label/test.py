@@ -24,11 +24,11 @@ class MultiLabelClassifier(nn.Module):
 
 
 # 初始化多标签分类模型
-num_labels = 3  # 这里假设你的模型有3个标签/4
+num_labels = 7  # 这里假设你的模型有3个标签/4
 model = MultiLabelClassifier(num_labels)
 
 # 加载训练好的模型权重
-model_path = 'multi_label_model.pth'
+model_path = 'incremental_multi_label_model.pth'
 model.load_state_dict(torch.load(model_path))
 model.eval()
 
@@ -36,7 +36,9 @@ model.eval()
 test_data = [
     "This is a positive sentence.",
     "This is a negative sentence.",
-    "Another positive example."
+    "Another positive example.",
+    "New positive example",
+    "all",
 ]
 
 # 数据预处理

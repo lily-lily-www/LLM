@@ -1,4 +1,4 @@
 # 我的环境名py3.7
 sklearn
-transformers
+transformers==4.11.3
 torch
